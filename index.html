@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script language="javascript">
+function sendJson(user, channel, jsonObject, fnsuccess) {
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == 4 && xhr.status == 200) {
+      fnsuccess(jsonObject);
+    }
+  };
+
+  xhr.open('POST', 'msgsys.php', true);
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  xhr.send('user=' + user + '&channel=' + channel + '&jsondata=' + encodeURIComponent(JSON.stringify(jsonObject)) + '&method=sent');
+}
+
+function sentjson(jsonObject) {
+//  alert(jsonObject.msg);
+}
+
+function recvJson(user, channel, fnsuccess) {
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == 4 && xhr.status == 200) {
+      var jsons = xhr.responseText;
+      var jsonStrs = jsons.split("\r\n\r\n");
+      for (var i = 1 ; i < jsonStrs.length; ++i) fnsuccess(JSON.parse(jsonStrs[i]));
+      clearTimeout(pollTimeout);
+      pollJson(user,channel);
+    }
+    else if (xhr.readyState == 4 && xhr.status == 404) {
+      clearTimeout(pollTimeout);
+      pollJson(user,channel);
+    }
+  };
+
+  xhr.open('POST', 'msgsys.php', true);
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  xhr.send('user=' + user + '&channel=' + channel + '&method=get');
+}
+
+var pollTimeout;
+function recvjson(jsonObject) {
+  var divText = document.createElement('div');
+  divText.appendChild(document.createTextNode('recved ' + jsonObject.msg));
+  document.getElementById('divMessages').appendChild(divText);
+}
+
+function pollJson(user,channel) {
+  pollTimeout = setTimeout(function() { recvJson(user,channel, recvjson) }, 2000);
+}
+
+</script>
+</head>
+<body>
+  <form>
+    <input id="txtUser" type="text" size="10" placeholder="Enter user"/><input id="txtChannel" type="text" size="10" placeholder="Enter channel"/><input id="txtMsg" type="text" size="10" placeholder="Enter msg"/>
+    <button type="button" onclick="javascript:sendJson(document.getElementById('txtUser').value,document.getElementById('txtChannel').value, {msg: document.getElementById('txtMsg').value}, sentjson)">Send msg</button>    <button type="button" onclick="javascript:recvJson(document.getElementById('txtUser').value,document.getElementById('txtChannel').value,recvjson);this.style['display'] = 'none';">Poll msg</button>
+</form>
+<h3>Messages</h3>
+<div id="divMessages"></div>
+</body>
+</html>
