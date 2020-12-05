@@ -53,15 +53,34 @@ function pollJson(user,channel) {
 }
 
 </script>
+<style>
+form div {
+  font-size: 16px;
+  width: 300px;
+}
+form div input {
+  width: 300px;
+  margin: 10px;
+}
+form div button {
+  width: 100px;
+  margin: 10px;
+}
+</style>
 </head>
 <body>
   <form>
-    <input id="txtUser" type="text" size="10" placeholder="Enter user"/><input id="txtChannel" type="text" size="10" placeholder="Enter channel"/><input id="txtMsg" type="text" size="10" placeholder="Enter msg"/>
-    <button id="send_btn" type="button" onclick="javascript:sendJson(document.getElementById('txtUser').value,document.getElementById('txtChannel').value, {msg: document.getElementById('txtMsg').value}, sentjson)">Send msg</button>    <button type="button" onclick="javascript:recvJson(document.getElementById('txtUser').value,document.getElementById('txtChannel').value,recvjson);this.style['display'] = 'none';">Poll msg</button>
-</form>
-<h3>Messages</h3>
-<div id="divMessages"></div>
-<script language="javascript">
+    <div>Enter user</div><div><input id="txtUser" type="text" size="10" placeholder="Enter user"/></div>
+    <div>Enter channel</div><div><input id="txtChannel" type="text" size="10" placeholder="Enter channel"/></div>
+    <div><button id="poll_btn" type="button" onclick="javascript:recvJson(document.getElementById('txtUser').value,document.getElementById('txtChannel').value,recvjson);this.style['display'] = 'none';">Poll msg</button></div>
+    <div>Enter Message</div><div><input id="txtMsg" type="text" size="10" placeholder="Enter msg"/></div>
+    <div>
+      <button id="send_btn" type="button" onclick="javascript:sendJson(document.getElementById('txtUser').value,document.getElementById('txtChannel').value, {msg: document.getElementById('txtMsg').value}, sentjson)">Send msg</button>
+    </div>
+  </form>
+  <h3>Messages</h3>
+  <div id="divMessages"></div>
+  <script language="javascript">
     window.txtMsg.onkeypress = function(e) {
       if (e.keyCode == 13) {
         sendJson( document.getElementById('txtUser').value,
@@ -69,6 +88,6 @@ function pollJson(user,channel) {
                   {msg: document.getElementById('txtMsg').value}, sentjson);
       }
     };
-</script>
+  </script>
 </body>
 </html>
