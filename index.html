@@ -17,6 +17,7 @@ function sendJson(user, channel, jsonObject, fnsuccess) {
 
 function sentjson(jsonObject) {
 //  alert(jsonObject.msg);
+  window.txtMsg.value = '';
 }
 
 function recvJson(user, channel, fnsuccess) {
@@ -56,9 +57,18 @@ function pollJson(user,channel) {
 <body>
   <form>
     <input id="txtUser" type="text" size="10" placeholder="Enter user"/><input id="txtChannel" type="text" size="10" placeholder="Enter channel"/><input id="txtMsg" type="text" size="10" placeholder="Enter msg"/>
-    <button type="button" onclick="javascript:sendJson(document.getElementById('txtUser').value,document.getElementById('txtChannel').value, {msg: document.getElementById('txtMsg').value}, sentjson)">Send msg</button>    <button type="button" onclick="javascript:recvJson(document.getElementById('txtUser').value,document.getElementById('txtChannel').value,recvjson);this.style['display'] = 'none';">Poll msg</button>
+    <button id="send_btn" type="button" onclick="javascript:sendJson(document.getElementById('txtUser').value,document.getElementById('txtChannel').value, {msg: document.getElementById('txtMsg').value}, sentjson)">Send msg</button>    <button type="button" onclick="javascript:recvJson(document.getElementById('txtUser').value,document.getElementById('txtChannel').value,recvjson);this.style['display'] = 'none';">Poll msg</button>
 </form>
 <h3>Messages</h3>
 <div id="divMessages"></div>
+<script language="javascript">
+    window.txtMsg.onkeypress = function(e) {
+      if (e.keyCode == 13) {
+        sendJson( document.getElementById('txtUser').value,
+                  document.getElementById('txtChannel').value,
+                  {msg: document.getElementById('txtMsg').value}, sentjson);
+      }
+    };
+</script>
 </body>
 </html>
