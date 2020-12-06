@@ -52,7 +52,7 @@ function pollJson(user,channel) {
   pollTimeout = setTimeout(function() { recvJson(user,channel, recvjson) }, 2000);
 }
 
-function deleteJson(user, channel) {
+function deleteJson(user, channel, fnsuccess) {
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4 && xhr.status == 200) {
@@ -69,7 +69,7 @@ function deleteJson(user, channel) {
 
 function deletedjson() {
 //  alert(jsonObject.msg);
-  window.txtMsg.value = '';
+  window.txtUser.value = '';
 }
 
 </script>

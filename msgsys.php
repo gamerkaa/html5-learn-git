@@ -33,4 +33,14 @@ if ($method === 'sent') {
 } else if ($method == 'delete') {
   $fileuser = $filepath . "_" . $user;
   if (file_exists($fileuser)) unlink($fileuser);
+  $fileuser_prefix = $channel . "_";
+  $dirhandle = opendir(dirname($fileuser));
+  while (($direntry = readdir($dirhandle)) !== false) {
+    if (strrpos($direntry, $fileuser_prefix) !== false) {
+      closedir($dirhandle);
+      return;
+    }
+  }
+  closedir($dirhandle);
+  unlink($filepath);
 }
