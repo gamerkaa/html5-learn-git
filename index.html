@@ -52,6 +52,26 @@ function pollJson(user,channel) {
   pollTimeout = setTimeout(function() { recvJson(user,channel, recvjson) }, 2000);
 }
 
+function deleteJson(user, channel) {
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == 4 && xhr.status == 200) {
+      fnsuccess();
+    }
+  };
+
+  clearTimeout(pollTimeout);
+
+  xhr.open('POST', 'msgsys.php', true);
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  xhr.send('user=' + user + '&channel=' + channel + '&method=delete');
+}
+
+function deletedjson() {
+//  alert(jsonObject.msg);
+  window.txtMsg.value = '';
+}
+
 </script>
 <style>
 form div {
@@ -73,6 +93,7 @@ form div button {
     <div>Enter user</div><div><input id="txtUser" type="text" size="10" placeholder="Enter user"/></div>
     <div>Enter channel</div><div><input id="txtChannel" type="text" size="10" placeholder="Enter channel"/></div>
     <div><button id="poll_btn" type="button" onclick="javascript:recvJson(document.getElementById('txtUser').value,document.getElementById('txtChannel').value,recvjson);this.style['display'] = 'none';">Poll msg</button></div>
+    <div><button id="delete_btn" type="button" onclick="javascript:deleteJson(document.getElementById('txtUser').value,document.getElementById('txtChannel').value,deletedjson);window.poll_btn.style['display'] = this.style['display'];">Delete User</button></div>
     <div>Enter Message</div><div><input id="txtMsg" type="text" size="10" placeholder="Enter msg"/></div>
     <div>
       <button id="send_btn" type="button" onclick="javascript:sendJson(document.getElementById('txtUser').value,document.getElementById('txtChannel').value, {msg: document.getElementById('txtMsg').value}, sentjson)">Send msg</button>

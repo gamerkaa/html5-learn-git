@@ -30,4 +30,7 @@ if ($method === 'sent') {
   } else {
     http_response_code(404);
   }
+} else if ($method == 'delete') {
+  $fileuser = $filepath . "_" . $user;
+  if (file_exists($fileuser)) unlink($fileuser);
 }
