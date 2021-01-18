@@ -1,92 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script language="javascript">
-function sendJson(user, channel, jsonObject, fnsuccess) {
-  var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState == 4 && xhr.status == 200) {
-      fnsuccess(jsonObject);
+  <script language="javascript" src="msgsys.js"></script>
+  <script language="javascript">
+    /* All msgsys callbacks defined here */
+    function sentjson(jsonObject) {
+      //alert(jsonObject.msg);
+      window.txtMsg.value = '';
     }
-  };
 
-  xhr.open('POST', 'msgsys.php', true);
-  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  xhr.send('user=' + user + '&channel=' + channel + '&jsondata=' + encodeURIComponent(JSON.stringify(jsonObject)) + '&method=sent');
-}
-
-function sentjson(jsonObject) {
-//  alert(jsonObject.msg);
-  window.txtMsg.value = '';
-}
-
-function recvJson(user, channel, fnsuccess) {
-  var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState == 4 && xhr.status == 200) {
-      var jsons = xhr.responseText;
-      var jsonStrs = jsons.split("\r\n\r\n");
-      for (var i = 1 ; i < jsonStrs.length; ++i) fnsuccess(JSON.parse(jsonStrs[i]));
-      clearTimeout(pollTimeout);
-      pollJson(user,channel);
+    function recvjson(jsonObject) {
+      var divText = document.createElement('div');
+      divText.appendChild(document.createTextNode('recved ' + jsonObject.msg));
+      document.getElementById('divMessages').appendChild(divText);
     }
-    else if (xhr.readyState == 4 && xhr.status == 404) {
-      clearTimeout(pollTimeout);
-      pollJson(user,channel);
+
+    function deletedjson() {
+      //alert(jsonObject.msg);
+      window.txtUser.value = '';
     }
-  };
-
-  xhr.open('POST', 'msgsys.php', true);
-  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  xhr.send('user=' + user + '&channel=' + channel + '&method=get');
-}
-
-var pollTimeout;
-function recvjson(jsonObject) {
-  var divText = document.createElement('div');
-  divText.appendChild(document.createTextNode('recved ' + jsonObject.msg));
-  document.getElementById('divMessages').appendChild(divText);
-}
-
-function pollJson(user,channel) {
-  pollTimeout = setTimeout(function() { recvJson(user,channel, recvjson) }, 2000);
-}
-
-function deleteJson(user, channel, fnsuccess) {
-  var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState == 4 && xhr.status == 200) {
-      fnsuccess();
-    }
-  };
-
-  clearTimeout(pollTimeout);
-
-  xhr.open('POST', 'msgsys.php', true);
-  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  xhr.send('user=' + user + '&channel=' + channel + '&method=delete');
-}
-
-function deletedjson() {
-//  alert(jsonObject.msg);
-  window.txtUser.value = '';
-}
-
-</script>
-<style>
-form div {
-  font-size: 16px;
-  width: 300px;
-}
-form div input {
-  width: 300px;
-  margin: 10px;
-}
-form div button {
-  width: 100px;
-  margin: 10px;
-}
-</style>
+  </script>
+  <style>
+  form div {
+    font-size: 16px;
+    width: 300px;
+  }
+  form div input {
+    width: 300px;
+    margin: 10px;
+  }
+  form div button {
+    width: 100px;
+    margin: 10px;
+  }
+  </style>
 </head>
 <body>
   <form>
