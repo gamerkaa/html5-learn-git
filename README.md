@@ -11,3 +11,6 @@ This app is a backend script that allows inter-pc messaging on apache/xampp serv
 
 Use the index.html to customise the script according to requirements. The msgsys.php and folder structure is not to be altered.
 Also keep in mind the url to the msgsys.php file when customising index.html for use in custom site.
+
+## msgsys summary
+A short explanation is given about usage and origin of msgsys messaging [here](http://gamerkaa.github.io/msgsys).
