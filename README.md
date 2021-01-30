@@ -1,7 +1,7 @@
-# html5-learn-git
+# msgsys
 Learning to write HTML5, Javascript, Ajax and PHP program to allow for inter-pc messaging.
 
-## msgsys
+## Using msgsys
 This app is a backend script that allows inter-pc messaging on apache/xampp server.
 1. index.html allows user to login to a channel with specified username (Use Poll Msg button).
 2. Click the send msg textbox and type in text, then hit Send Msg to send it (using the 'Enter' key works too)
