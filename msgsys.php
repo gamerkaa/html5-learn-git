@@ -11,14 +11,18 @@ $user = str_replace("'", "''", $_POST['user']);
 if ($method === 'sent') {
   $db = new Model();
   $id = 0;
+  $rowcount = 0;
   $db->query("SELECT id FROM mstbl_users WHERE user = :user AND channel = :channel");
   $db->bind(':user', $user);
   $db->bind(':channel', $channel);
   if ($rows = $db->resultSet()) {
-    foreach($rows as $row) $id = $row['id'];
+    foreach($rows as $row) {
+      $id = $row['id'];
+      ++$rowcount;
+    }
   }
 
-  if ($id == 0) {
+  if ($id == 0 && $rowcount == 0) {
     $db->query("INSERT INTO mstbl_users (id,user,channel) VALUES(0,:user,:channel)");
     $db->bind(':user', $user);
     $db->bind(':channel', $channel);
