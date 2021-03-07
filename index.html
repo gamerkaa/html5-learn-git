@@ -9,10 +9,12 @@
       window.txtMsg.value = '';
     }
 
-    function recvjson(jsonObject) {
-      var divText = document.createElement('div');
-      divText.appendChild(document.createTextNode('recved ' + jsonObject.msg));
-      document.getElementById('divMessages').appendChild(divText);
+    function recvjson(jsonArray) {
+      jsonArray.forEach(element => {
+        var divText = document.createElement('div');
+        divText.appendChild(document.createTextNode('recved ' + element.msg));
+        document.getElementById('divMessages').appendChild(divText);
+      });
     }
 
     function deletedjson() {
