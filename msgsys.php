@@ -1,7 +1,8 @@
 <?php
 
 require_once('config.php');
-require_once('Model.php');
+require_once('classes/Model.php');
+require_once('classes/MsgSysModel.php');
 
 $channel = 'mstbl_' . $_POST['channel'];
 if (isset($_POST['jsondata'])) $jsonData = str_replace("'", "''", $_POST['jsondata']);
@@ -9,10 +10,10 @@ $method = $_POST['method'];
 $user = str_replace("'", "''", $_POST['user']);
 
 if ($method === 'sent') {
-  $db = new Model();
+  $db = new MsgSysModel();
   $id = 0;
   $rowcount = 0;
-  $db->query("SELECT id FROM mstbl_users WHERE user = :user AND channel = :channel");
+  $db->query("SELECT id FROM mstblusers WHERE user = :user AND channel = :channel");
   $db->bind(':user', $user);
   $db->bind(':channel', $channel);
   if ($rows = $db->resultSet()) {
@@ -23,7 +24,7 @@ if ($method === 'sent') {
   }
 
   if ($id == 0 && $rowcount == 0) {
-    $db->query("INSERT INTO mstbl_users (id,user,channel) VALUES(0,:user,:channel)");
+    $db->query("INSERT INTO mstblusers (id,user,channel) VALUES(0,:user,:channel)");
     $db->bind(':user', $user);
     $db->bind(':channel', $channel);
     $db->execute();
@@ -46,10 +47,10 @@ if ($method === 'sent') {
     }
   }
 } else if ($method === 'get') {
-  $db = new Model();
+  $db = new MsgSysModel();
   $id = 0;
   $rowcount = 0;
-  $db->query("SELECT id FROM mstbl_users WHERE user = :user AND channel = :channel");
+  $db->query("SELECT id FROM mstblusers WHERE user = :user AND channel = :channel");
   $db->bind(':user', $user);
   $db->bind(':channel', $channel);
   if ($rows = $db->resultSet()) {
@@ -60,7 +61,7 @@ if ($method === 'sent') {
   }
 
   if ($id == 0 && $rowcount == 0) {
-    $db->query("INSERT INTO mstbl_users (id,user,channel) VALUES(0,:user,:channel)");
+    $db->query("INSERT INTO mstblusers (id,user,channel) VALUES(0,:user,:channel)");
     $db->bind(':user', $user);
     $db->bind(':channel', $channel);
     $db->execute();
@@ -82,7 +83,7 @@ if ($method === 'sent') {
     }
     echo ']';
     
-    $db->query("UPDATE mstbl_users SET id = :id WHERE user = :user AND channel = :channel");
+    $db->query("UPDATE mstblusers SET id = :id WHERE user = :user AND channel = :channel");
     $db->bind(':id', $lastid);
     $db->bind(':user', $user);
     $db->bind(':channel', $channel);
@@ -92,13 +93,13 @@ if ($method === 'sent') {
     return;
   }
 } else if ($method == 'delete') {
-  $db = new Model();
-  $db->query("DELETE FROM mstbl_users WHERE user = :user AND channel = :channel");
+  $db = new MsgSysModel();
+  $db->query("DELETE FROM mstblusers WHERE user = :user AND channel = :channel");
   $db->bind(':user', $user);
   $db->bind(':channel', $channel);
   $db->execute();
 
-  $db->query("SELECT COUNT(*) AS usercount FROM mstbl_users WHERE channel = :channel");
+  $db->query("SELECT COUNT(*) AS usercount FROM mstblusers WHERE channel = :channel");
   $db->bind(':channel', $channel);
   $usercount = $db->single()['usercount'];
   if ($usercount == 0) {

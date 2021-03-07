@@ -12,3 +12,7 @@ Messages are passed by calling Javascript functions and received using javascrip
 This mechanism can be used in non-critical applications like chat, multiuser apps, notifications to good effect. The basic needs / required parameters are channel name and username. Thus applications can use channels to track user site data and navigation.
 
 The message system is itself very lightweight and can be learnt quickly.
+
+## Configuration
+
+The settings for msgsys are given in config.php. Alter them for your own database setup.
