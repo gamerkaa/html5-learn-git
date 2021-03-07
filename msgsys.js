@@ -31,9 +31,7 @@ function recvJson(user, channel, fnsuccess) {
     xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4 && xhr.status == 200) {
-            var jsons = xhr.responseText;
-            var jsonStrs = jsons.split("\r\n\r\n");
-            for (var i = 1 ; i < jsonStrs.length; ++i) fnsuccess(JSON.parse(jsonStrs[i]));
+            fnsuccess(JSON.parse(xhr.responseText));
             clearTimeout(pollTimeout);
             pollJson(user,channel);
         }

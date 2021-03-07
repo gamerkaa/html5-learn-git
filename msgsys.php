@@ -1,46 +1,104 @@
 <?php
 
-$channel = $_POST['channel'];
-if (isset($_POST['jsondata'])) $jsonData = $_POST['jsondata'];
-$method = $_POST['method'];
-$user = $_POST['user'];
+require_once('config.php');
+require_once('Model.php');
 
-$filepath = dirname($_SERVER['SCRIPT_FILENAME']) . "/" . $channel;
+$channel = 'mstbl_' . $_POST['channel'];
+if (isset($_POST['jsondata'])) $jsonData = str_replace("'", "''", $_POST['jsondata']);
+$method = $_POST['method'];
+$user = str_replace("'", "''", $_POST['user']);
 
 if ($method === 'sent') {
-  $fileuser = $filepath . "_" . $user;
-  file_put_contents($filepath, "\r\n\r\n" . $jsonData, FILE_APPEND | LOCK_EX);
-  if (!file_exists($fileuser)) file_put_contents($fileuser, "0");
-} else if ($method === 'get') {
-  $fileuser = $filepath . "_" . $user;
-  if (!file_exists($fileuser)) file_put_contents($fileuser, "0");
-  $filelen = file_get_contents($fileuser);
-  $filepathlen = filesize($filepath);
-  if ($filelen == $filepathlen) { http_response_code(404); return; }
-  $handle = fopen($filepath, "r+");
-  if (isset($handle)) {
-    $block = 1;
-    flock($handle, LOCK_SH, $block);
-    fseek($handle, $filelen);
-    $output = fread($handle, $filepathlen - $filelen);
-    flock($handle, LOCK_UN);
-    fclose($handle);
-    file_put_contents($fileuser, $filepathlen);
-    echo $output;
-  } else {
-    http_response_code(404);
+  $db = new Model();
+  $id = 0;
+  $db->query("SELECT id FROM mstbl_users WHERE user = :user AND channel = :channel");
+  $db->bind(':user', $user);
+  $db->bind(':channel', $channel);
+  if ($rows = $db->resultSet()) {
+    foreach($rows as $row) $id = $row['id'];
   }
-} else if ($method == 'delete') {
-  $fileuser = $filepath . "_" . $user;
-  if (file_exists($fileuser)) unlink($fileuser);
-  $fileuser_prefix = $channel . "_";
-  $dirhandle = opendir(dirname($fileuser));
-  while (($direntry = readdir($dirhandle)) !== false) {
-    if (strrpos($direntry, $fileuser_prefix) !== false) {
-      closedir($dirhandle);
-      return;
+
+  if ($id == 0) {
+    $db->query("INSERT INTO mstbl_users (id,user,channel) VALUES(0,:user,:channel)");
+    $db->bind(':user', $user);
+    $db->bind(':channel', $channel);
+    $db->execute();
+  }
+
+  $db->query("INSERT INTO " . $channel . " (user,jsondata) VALUES(:user,:jsondata)");
+  $db->bind(':user', $user);
+  $db->bind(':jsondata', $jsonData);
+  $db->execute();
+  if (!$db->lastInsertId())
+  {
+    $db->query("CREATE TABLE " . $channel . " (id BIGINT AUTO_INCREMENT UNIQUE, user VARCHAR(50) NOT NULL, jsondata VARCHAR(2000) NOT NULL)");
+    $db->execute();
+
+    $db->query("INSERT INTO " . $channel . " (user,jsondata) VALUES(:user,:jsondata)");
+    $db->bind(':user', $user);
+    $db->bind(':jsondata', $jsonData);
+    if ($db->single()) {
+      foreach($rows as $row) $id = $row['id'];
     }
   }
-  closedir($dirhandle);
-  unlink($filepath);
+} else if ($method === 'get') {
+  $db = new Model();
+  $id = 0;
+  $rowcount = 0;
+  $db->query("SELECT id FROM mstbl_users WHERE user = :user AND channel = :channel");
+  $db->bind(':user', $user);
+  $db->bind(':channel', $channel);
+  if ($rows = $db->resultSet()) {
+    foreach($rows as $row) {
+      $id = $row['id'];
+      ++$rowcount;
+    }
+  }
+
+  if ($id == 0 && $rowcount == 0) {
+    $db->query("INSERT INTO mstbl_users (id,user,channel) VALUES(0,:user,:channel)");
+    $db->bind(':user', $user);
+    $db->bind(':channel', $channel);
+    $db->execute();
+  }
+
+  $db->query("SELECT id, jsondata FROM " .$channel ." WHERE id > :id ORDER BY id ASC");
+  $db->bind(':id', $id);
+  if ($rows = $db->resultSet())
+  {
+    $printcomma = false;
+    $lastid = 0;
+    echo '[';
+    foreach ($rows as $row)
+    {
+      if ($printcomma) { echo ','; }
+      else $printcomma = true;
+      echo str_replace("''", "'", $row['jsondata']);
+      $lastid = $row['id'];
+    }
+    echo ']';
+    
+    $db->query("UPDATE mstbl_users SET id = :id WHERE user = :user AND channel = :channel");
+    $db->bind(':id', $lastid);
+    $db->bind(':user', $user);
+    $db->bind(':channel', $channel);
+    $db->execute();
+  } else {
+    http_response_code(404);
+    return;
+  }
+} else if ($method == 'delete') {
+  $db = new Model();
+  $db->query("DELETE FROM mstbl_users WHERE user = :user AND channel = :channel");
+  $db->bind(':user', $user);
+  $db->bind(':channel', $channel);
+  $db->execute();
+
+  $db->query("SELECT COUNT(*) AS usercount FROM mstbl_users WHERE channel = :channel");
+  $db->bind(':channel', $channel);
+  $usercount = $db->single()['usercount'];
+  if ($usercount == 0) {
+    $db->query("DROP TABLE `" . $channel . "`");
+    $db->execute();
+  }
 }
